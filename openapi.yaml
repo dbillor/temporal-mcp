@@ -1,0 +1,268 @@
+openapi: 3.0.1
+info:
+  title: Temporal Tools API
+  version: 1.0.0
+paths:
+  /list_workflows:
+    post:
+      operationId: temporal.list_workflows
+      summary: List workflows matching an optional query.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Optional filter query.
+                page_size:
+                  type: integer
+                  description: Number of results per page.
+                next_page_token:
+                  type: string
+                  description: Continuation token for pagination.
+      responses:
+        '200':
+          description: A list of workflow summaries.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WorkflowSummary'
+                  next_page_token:
+                    type: string
+  /describe_workflow:
+    post:
+      operationId: temporal.describe_workflow
+      summary: Describe a workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                run_id:
+                  type: string
+              required:
+                - workflow_id
+      responses:
+        '200':
+          description: Workflow description.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  execution:
+                    $ref: '#/components/schemas/WorkflowSummary'
+                  status:
+                    type: string
+  /start_workflow:
+    post:
+      operationId: temporal.start_workflow
+      summary: Start a new workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                task_queue:
+                  type: string
+                input:
+                  type: object
+                options:
+                  type: object
+              required:
+                - workflow_id
+                - task_queue
+      responses:
+        '200':
+          description: Started workflow execution.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow_id:
+                    type: string
+                  run_id:
+                    type: string
+  /get_workflow_result:
+    post:
+      operationId: temporal.get_workflow_result
+      summary: Retrieve the result of a workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                run_id:
+                  type: string
+              required:
+                - workflow_id
+      responses:
+        '200':
+          description: Workflow result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+  /signal_workflow:
+    post:
+      operationId: temporal.signal_workflow
+      summary: Send a signal to a workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                run_id:
+                  type: string
+                signal:
+                  type: string
+                args:
+                  type: object
+              required:
+                - workflow_id
+                - signal
+      responses:
+        '200':
+          description: Signal acknowledged.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  run_id:
+                    type: string
+  /query_workflow:
+    post:
+      operationId: temporal.query_workflow
+      summary: Query a workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                run_id:
+                  type: string
+                query_type:
+                  type: string
+                args:
+                  type: object
+              required:
+                - workflow_id
+                - query_type
+      responses:
+        '200':
+          description: Query result.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+  /cancel_workflow:
+    post:
+      operationId: temporal.cancel_workflow
+      summary: Request cancellation of a workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                run_id:
+                  type: string
+                reason:
+                  type: string
+              required:
+                - workflow_id
+      responses:
+        '200':
+          description: Cancellation requested.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  run_id:
+                    type: string
+  /terminate_workflow:
+    post:
+      operationId: temporal.terminate_workflow
+      summary: Force terminate a workflow execution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workflow_id:
+                  type: string
+                run_id:
+                  type: string
+                reason:
+                  type: string
+              required:
+                - workflow_id
+      responses:
+        '200':
+          description: Workflow terminated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  run_id:
+                    type: string
+components:
+  schemas:
+    WorkflowSummary:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+        run_id:
+          type: string
+        type:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+

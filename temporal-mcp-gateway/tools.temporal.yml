@@ -1,0 +1,11 @@
+version: "2025-03-26"
+tools:
+  - name: temporal.list_namespaces
+    input: {}
+    output:
+      type: object
+  - name: temporal.start_workflow
+    input:
+      type: object
+    output:
+      type: object
